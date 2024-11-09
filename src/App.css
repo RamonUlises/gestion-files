@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.grid-res{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6rem, 6rem));
+  grid-auto-rows: 6rem;
+}
