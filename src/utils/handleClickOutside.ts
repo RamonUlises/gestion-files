@@ -11,7 +11,7 @@ export const handleClickOutside = async (
   valueRenember: string,
   path: string,
   setPath: React.Dispatch<React.SetStateAction<string>>,
-  setFiles: React.Dispatch<React.SetStateAction<string[]>>,
+  setFiles: React.Dispatch<React.SetStateAction<{nombre: string, dir: boolean}[]>>,
   setRenember: React.Dispatch<
     React.SetStateAction<{
       visible: boolean;

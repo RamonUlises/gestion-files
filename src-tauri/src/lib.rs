@@ -15,6 +15,9 @@ pub fn run() {
         commands::pegar_archivo_carpeta,
         commands::eliminar_archivo_carpeta,
         commands::cortar_archivo_carpeta,
+        commands::obtener_imagen_base64,
+        commands::crear_carpeta,
+        commands::crear_archivo,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

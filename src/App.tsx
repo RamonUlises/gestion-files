@@ -12,17 +12,19 @@ import { loadDirectory } from "./utils/loadDirectory";
 import "./App.css";
 import { optionsFolder } from "./utils/optionsFolder";
 import { handleClickOutside } from "./utils/handleClickOutside";
-import { activeRenember } from "./utils/activeRenember";
 import { invoke } from "@tauri-apps/api/core";
 import { pegarFunc } from "./utils/pegarFunc";
 import { copiarFunc } from "./utils/copiarFunc";
-import { borrarFunc } from "./utils/borrarFunc";
 import { cortarFunc } from "./utils/cortarFunc";
+import { cortarPegarFunc } from "./utils/cortarPegarFunc";
+import { MostrarFolders } from "./components/MostrarFolders";
+import { GetIconExt } from "./components/GetIconExt";
 
 function App() {
   const [path, setPath] = useState<string>("");
-  const [files, setFiles] = useState<string[]>([]);
+  const [files, setFiles] = useState<{nombre: string, dir: boolean}[]>([]);
   const [Folders, setFolders] = useState<string[]>([]);
+  const [archivos, setArchivos] = useState<string[]>([]);
   const [nextPath, setNextPath] = useState<string[]>([]);
 
   const [contextMenu, setContextMenu] = useState<{ visible: boolean, x: number, y: number, folder: string | null}>({ visible: false, x: 0, y: 0, folder: null });
@@ -41,7 +43,7 @@ function App() {
 
   useEffect(() => {
     loadDesktopDirectory(setPath, setFiles);
-    selectedFolder(files, setFolders);
+    selectedFolder(files, setFolders, setArchivos);
 
     const fetchSelector = async () => {
       const res: string[] = await invoke("obtener_selector");
@@ -57,7 +59,7 @@ function App() {
   }, [path]);
 
   useEffect(() => {
-    selectedFolder(files, setFolders);
+    selectedFolder(files, setFolders, setArchivos);
     setFolderSelected("");
   }, [files]);
 
@@ -71,7 +73,7 @@ function App() {
       if(event.ctrlKey && event.key === "v") {
         event.preventDefault();
         if(cortar || fileCortar !== "") {
-          await cortarPegarFunc();
+          await cortarPegarFunc(fileCortar, path, setCortar, setFileCortar, setPath, setFiles);
         } else {
           await pegarFunc(path, setPath, setFiles);
         }
@@ -90,19 +92,9 @@ function App() {
     }
   }, [folderSelected]);
 
-  async function cortarPegarFunc() {
-    const response = await invoke("cortar_archivo_carpeta", { rutaOrigen: fileCortar, rutaDestino: path });
-
-    if(response === "Archivo cortado") {
-      await loadDirectory(path, setPath, setFiles);
-      setCortar(false);
-      setFileCortar("");
-    }
-  }
-
   return (
     <main onClick={(event) => handleClickOutside(event, renember, valueRenember, path, setPath, setFiles, setRenember, contextMenu, setContextMenu, folderSelected, setFolderSelected)} className="bg-gradient-to-tr to-slate-900 from-black w-screen h-screen m-0 p-0 overflow-hidden">
-      <Aside setNextPath={setNextPath} nextPath={nextPath} path={path} setPath={setPath} selector={selector} />
+      <Aside setNextPath={setNextPath} nextPath={nextPath} path={path} setPath={setPath} selector={selector} setFiles={setFiles} setRenember={setRenember} setValueRenember={setValueRenember} />
       <section className="flex w-full h-full">
         <Navbar  path={path} setPath={setPath} selector="selector" />
         <div className="grid-res pt-4 pb-12 px-2 gap-2 w-full overflow-y-auto">
@@ -135,26 +127,40 @@ function App() {
                   )
                 }
                 {contextMenu.visible && contextMenu.folder === file && (
-              <div
-                className="flex flex-col bg-zinc-800 text-white absolute rounded-md overflow-hidden z-20"
-                style={{ top: contextMenu.y - 20, left: contextMenu.x - 180 }}
-              >
-                <button onClick={() => activeRenember(file, setRenember, setValueRenember)} className="px-4 py-1 hover:bg-zinc-700 w-full text-start text-sm transition-colors duration-300 pr-12">
-                  Renombrar
-                </button>
-                <button onClick={async () => await pegarFunc(path, setPath, setFiles)} className="px-4 py-1 hover:bg-zinc-700 w-full text-start text-sm transition-colors duration-300">
-                  Pegar
-                </button>
-                <button onClick={async () => copiarFunc(folderSelected, path, selector, setCortar)} className="px-4 py-1 hover:bg-zinc-700 w-full text-start text-sm transition-colors duration-300">
-                  Copiar
-                </button>
-                <button onClick={() => cortarFunc(file, path, setFileCortar, setCortar)} className="px-4 py-1 hover:bg-zinc-700 w-full text-start text-sm transition-colors duration-300">
-                  Cortar
-                </button>
-                <button onClick={() => borrarFunc(file, path, selector, setPath, setFiles)} className="px-4 py-1 hover:bg-zinc-700 w-full text-start text-sm transition-colors duration-300">
-                  Borrar
-                </button>
+              <MostrarFolders contextMenu={contextMenu} setRenember={setRenember} setValueRenember={setValueRenember} file={file} path={path} setPath={setPath} setFiles={setFiles} folderSelected={folderSelected} selector={selector} setCortar={setCortar} setFileCortar={setFileCortar} />
+            )}
               </div>
+            );
+          })}
+          {archivos.map((file) => {
+            const text = file.length > 8 ? file.slice(0, 8) + "..." : file;
+            return (
+              <div
+                data-name-folder={file}
+                onClick={() => setFolderSelected(file)}
+                onContextMenu={(e) => optionsFolder(e, file, foldersRef, setContextMenu, folderSelected, setFolderSelected)}
+                key={file}
+                ref={(element) => (foldersRef.current[file] = element!)}
+                className={`folders flex flex-col justify-center items-start rounded p-2 w-full max-w-24 h-full max-h-24 cursor-pointer relative ${folderSelected === file && "bg-zinc-800"}`}
+              >
+                <GetIconExt fileName={file} path={path} />
+                {
+                  renember.visible && renember.folder === file ? (
+                    <input
+                      id="input-renember"
+                      type="text"
+                      value={valueRenember}
+                      onChange={(e) => setValueRenember(e.target.value)}
+                      className="w-full bg-white valid:text-black text-sm z-20 outline-none px-2"
+                    />
+                  ) : (
+                    <p className="text-[12px] text-center w-full text-white">
+                      {text}
+                    </p>
+                  )
+                }
+                {contextMenu.visible && contextMenu.folder === file && (
+              <MostrarFolders contextMenu={contextMenu} setRenember={setRenember} setValueRenember={setValueRenember} file={file} path={path} setPath={setPath} setFiles={setFiles} folderSelected={folderSelected} selector={selector} setCortar={setCortar} setFileCortar={setFileCortar} />
             )}
               </div>
             );

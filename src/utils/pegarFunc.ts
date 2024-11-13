@@ -4,7 +4,7 @@ import { loadDirectory } from "./loadDirectory";
 export async function pegarFunc(
   path: string,
   setPath: React.Dispatch<React.SetStateAction<string>>,
-  setFiles: React.Dispatch<React.SetStateAction<string[]>>
+  setFiles: React.Dispatch<React.SetStateAction<{nombre: string, dir: boolean}[]>>
 ) {
   const rute = await navigator.clipboard.readText();
 

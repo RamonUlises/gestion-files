@@ -28,8 +28,6 @@ export const optionsFolder = (
 
   setFolderSelected(nameFolder);
 
-  if(folderSelected !== folderName) return;
-
   setContextMenu({
     visible: true,
     x: 254,
