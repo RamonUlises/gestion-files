@@ -17,7 +17,7 @@ import { getSelector } from "../utils/getSelector";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 
-const selector = await getSelector();
+const selector = async () => await getSelector();
 
 export const GetIconExt = ({
   fileName,

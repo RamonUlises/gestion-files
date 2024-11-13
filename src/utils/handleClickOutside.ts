@@ -3,7 +3,6 @@ import { loadDirectory } from "./loadDirectory";
 
 import { getSelector } from "./getSelector";
 
-const selector = await getSelector();
 
 export const handleClickOutside = async (
   event: React.MouseEvent<HTMLElement, MouseEvent>,
@@ -13,10 +12,10 @@ export const handleClickOutside = async (
   setPath: React.Dispatch<React.SetStateAction<string>>,
   setFiles: React.Dispatch<React.SetStateAction<{nombre: string, dir: boolean}[]>>,
   setRenember: React.Dispatch<
-    React.SetStateAction<{
-      visible: boolean;
-      folder: string | null;
-    }>
+  React.SetStateAction<{
+    visible: boolean;
+    folder: string | null;
+  }>
   >,
   contextMenu: {
     visible: boolean;
@@ -25,16 +24,18 @@ export const handleClickOutside = async (
     folder: string | null;
   },
   setContextMenu: React.Dispatch<
-    React.SetStateAction<{
-      visible: boolean;
-      x: number;
-      y: number;
-      folder: string | null;
-    }>>,
+  React.SetStateAction<{
+    visible: boolean;
+    x: number;
+    y: number;
+    folder: string | null;
+  }>>,
   folderSelected: string,
   setFolderSelected: React.Dispatch<React.SetStateAction<string>
   >
 ) => {
+  const selector = await getSelector();
+  
   if (renember.visible) {
     if (valueRenember === "") return;
     if ((event.target as HTMLElement).matches("#input-renember")) return;

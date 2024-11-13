@@ -104,7 +104,7 @@ function App() {
               <div
                 data-name-folder={file}
                 onClick={() => setFolderSelected(file)}
-                onContextMenu={(e) => optionsFolder(e, file, foldersRef, setContextMenu, folderSelected, setFolderSelected)}
+                onContextMenu={(e) => optionsFolder(e, file, foldersRef, setContextMenu, setFolderSelected)}
                 onDoubleClick={() => moveDirectory(path, file, setPath, renember.visible)}
                 key={file}
                 ref={(element) => (foldersRef.current[file] = element!)}
@@ -138,7 +138,7 @@ function App() {
               <div
                 data-name-folder={file}
                 onClick={() => setFolderSelected(file)}
-                onContextMenu={(e) => optionsFolder(e, file, foldersRef, setContextMenu, folderSelected, setFolderSelected)}
+                onContextMenu={(e) => optionsFolder(e, file, foldersRef, setContextMenu, setFolderSelected)}
                 key={file}
                 ref={(element) => (foldersRef.current[file] = element!)}
                 className={`folders flex flex-col justify-center items-start rounded p-2 w-full max-w-24 h-full max-h-24 cursor-pointer relative ${folderSelected === file && "bg-zinc-800"}`}

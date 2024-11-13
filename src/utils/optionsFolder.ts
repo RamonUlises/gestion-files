@@ -10,7 +10,6 @@ export const optionsFolder = (
       folder: string | null;
     }>
   >,
-  folderSelected: string,
   setFolderSelected: React.Dispatch<React.SetStateAction<string>>
 ) => {
   e.preventDefault();
